@@ -83,7 +83,7 @@ renderlist lst =
                     li [] [ text (toString element) ]
 
                 else
-                    li [] []
+                    span [] []
             )
             lst
         )
