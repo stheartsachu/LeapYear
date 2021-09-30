@@ -1,16 +1,17 @@
 module Main exposing (..)
 
-import Browser exposing (element)
+import Browser
 import Debug exposing (toString)
-import Html exposing (Html, div, input, li, span, text, ul)
+import Html exposing (Html, button, div, input, li, p, span, text, ul)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput, onMouseEnter, onMouseLeave)
 
 
 
 -- MAIN
 
 
+main : Program () Model Msg
 main =
     Browser.sandbox { init = init, update = update, view = view }
 
@@ -75,6 +76,7 @@ validationForInput str =
             0
 
 
+renderlist : List Int -> Html msg
 renderlist lst =
     ul []
         (List.map
@@ -89,19 +91,50 @@ renderlist lst =
         )
 
 
+yearValidation : String -> ( String, Bool )
+yearValidation stringArg =
+    if String.length stringArg > 3 && String.length stringArg == 4 then
+        ( "valid ", True )
+
+    else
+        ( "In-valid", False )
+
+
 view : Model -> Html Msg
 view model =
     div []
-        [ div []
-            [ span [] [ text "YearOne : " ]
+        [ span [] [ text "Assignment : Elm application with one single page, having two input types for inserting Years(Validation should be implemented). You have to print all the Leap Year between these two entered years. Entered years should not be included in the results." ]
+        , div []
+            [ span [] [ text "From :::: YearOne : " ]
             , input [ onInput InputedYearOne ] []
             ]
         , div []
-            [ span [] [ text "YearTwo : " ]
+            [ span [] [ text "TO ::::    YearTwo : " ]
             , input [ onInput InputedYearTwo ] []
             ]
-        , div [] [ text (toString model.intYearOne) ]
-        , div [] [ text (toString model.intYearTwo) ]
-        , div [] [ text (toString (yearsList model.intYearOne model.intYearTwo)) ]
-        , renderlist (yearsList model.intYearOne model.intYearTwo)
+        , if String.length model.yearOne == 0 && String.length model.yearTwo == 0 then
+            span [] [ text "Fistly Input Years to Check" ]
+
+          else
+            div []
+                [ div []
+                    [ p [] [ text ("Year One  : " ++ Tuple.first (yearValidation model.yearOne)) ]
+                    , p [] [ text ("Year Two  :  " ++ Tuple.first (yearValidation model.yearTwo)) ]
+                    ]
+                , if Tuple.second (yearValidation model.yearOne) && Tuple.second (yearValidation model.yearTwo) then
+                    if List.isEmpty (yearsList model.intYearOne model.intYearTwo) then
+                        span [] [ text "First Input Year should be Greater than Second One" ]
+
+                    else
+                        div []
+                            [ div [] [ text (toString model.intYearOne) ]
+                            , div [] [ text (toString model.intYearTwo) ]
+                            , div [] [ text ("List of Years between Two Entered Years : " ++ toString (yearsList model.intYearOne model.intYearTwo)) ]
+                            , span [] [ text "List of Leap Years" ]
+                            , renderlist (yearsList model.intYearOne model.intYearTwo)
+                            ]
+
+                  else
+                    span [] [ text "Try to Input Valid Years" ]
+                ]
         ]
